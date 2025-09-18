@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  projects        Project[]
+  projectMembers  ProjectMember[]
+  collaborationSessions CollaborationSession[]
+  aiInteractions  AIInteraction[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isPublic    Boolean  @default(false)
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  owner             User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members           ProjectMember[]
+  files             ProjectFile[]
+  collaborationSessions CollaborationSession[]
+  aiInteractions    AIInteraction[]
+
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  role      String   @default("member") // owner, admin, member, viewer
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("project_members")
+}
+
+model ProjectFile {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  path      String
+  content   String   @default("")
+  fileType  String   // js, ts, jsx, tsx, css, html, json, md, etc.
+  size      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, path])
+  @@map("project_files")
+}
+
+model CollaborationSession {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  cursorPosition Json?  // { line: number, column: number }
+  selection   Json?    // { startLine: number, startColumn: number, endLine: number, endColumn: number }
+  lastSeen    DateTime @default(now())
+  isActive    Boolean  @default(true)
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("collaboration_sessions")
+}
+
+model AIInteraction {
+  id          String   @id @default(cuid())
+  userId      String
+  projectId   String?
+  type        String   // completion, explanation, translation, debug
+  prompt      String
+  response    String
+  model       String   // gpt-4, claude-3, ollama, etc.
+  tokens      Int      @default(0)
+  cost        Float    @default(0)
+  latency     Int      @default(0) // milliseconds
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("ai_interactions")
+}
+
+model ChatMessage {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  content     String
+  type        String   @default("user") // user, assistant, system
+  metadata    Json?    // Additional data like code snippets, file references
+  createdAt   DateTime @default(now())
+
+  @@map("chat_messages")
+}
+
+model FileVersion {
+  id        String   @id @default(cuid())
+  fileId    String
+  content   String
+  version   Int
+  createdAt DateTime @default(now())
+  createdBy String
+
+  @@map("file_versions")
+}

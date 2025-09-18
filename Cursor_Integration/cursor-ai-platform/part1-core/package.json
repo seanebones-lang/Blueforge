@@ -1,0 +1,57 @@
+{
+  "name": "cursor-ai-platform-core",
+  "version": "1.0.0",
+  "description": "🌊 Cursor AI Platform - Core Foundation (DeepBlue Intelligence)",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "setup": "npm install && npm run setup:backend && npm run setup:frontend",
+    "setup:backend": "cd backend && npm install",
+    "setup:frontend": "cd frontend && npm install",
+    "db:migrate": "cd backend && npm run db:migrate",
+    "db:seed": "cd backend && npm run db:seed",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint"
+  },
+  "keywords": [
+    "cursor",
+    "ai",
+    "platform",
+    "deepblue",
+    "intelligence",
+    "code-editor",
+    "collaboration",
+    "real-time"
+  ],
+  "author": "DeepBlue Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deepblue-team/cursor-ai-platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/deepblue-team/cursor-ai-platform/issues"
+  },
+  "homepage": "https://github.com/deepblue-team/cursor-ai-platform#readme"
+}
